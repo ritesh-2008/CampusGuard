@@ -38,4 +38,33 @@ export const incidents = async (req, res) => {
         });
     }
 
+    
+
+}
+
+export const GetIncidents = async (req,res) => {
+    try{
+        const {data,error} = await Supabase.from("incidents").select("*").order("created_at",{ascending:false});
+
+         if (error) {
+            console.error("Supabase error:", error);
+
+            return res.status(500).json({
+                success: false,
+                message: "Failed to fetch incidents"
+            });
+        }
+
+        return res.status(200).json({
+            success:true,
+            incidents:data
+        })
+    }catch (error) {
+        console.error("Get incidents error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
+    }
 }

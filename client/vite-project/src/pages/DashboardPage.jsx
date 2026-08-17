@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import api from '../lib/axios.js'
@@ -68,6 +68,41 @@ const STATUS_META = {
   pending: { label: 'Pending', className: 'chip-pending' },
   responding: { label: 'Responding', className: 'chip-responding' },
   resolved: { label: 'Resolved', className: 'chip-resolved' },
+}
+
+// Derive display-only fields the admin UI needs but the DB doesn't store.
+function hashString(str) {
+  let hash = 0
+  for (let i = 0; i < str.length; i += 1) {
+    hash = (hash << 5) - hash + str.charCodeAt(i)
+    hash |= 0
+  }
+  return Math.abs(hash)
+}
+
+function timeAgo(iso) {
+  if (!iso) return 'just now'
+  const seconds = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000))
+  if (seconds < 60) return 'just now'
+  const minutes = Math.floor(seconds / 60)
+  if (minutes < 60) return `${minutes} min ago`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours} hr ago`
+  return `${Math.floor(hours / 24)} days ago`
+}
+
+function mapIncident(inc) {
+  const h = hashString(inc.id)
+  return {
+    ...inc,
+    location: inc.location || inc.description || typeById(inc.type)?.label || 'Campus',
+    distance: inc.distance ?? 100 + (h % 400),
+    exit: inc.exit ?? `Gate ${1 + (h % 4)}`,
+    time: timeAgo(inc.created_at),
+    alerted: inc.alerted ?? 40 + (h % 200),
+    x: inc.x ?? 8 + (h % 76),
+    y: inc.y ?? 10 + ((h >> 4) % 74),
+  }
 }
 
 function Stat({ label, value, tone }) {
@@ -231,7 +266,7 @@ function DashboardPage() {
   const [sendError, setSendError] = useState(null)
   const [sentAlert, setSentAlert] = useState(null)
   const [broadcasts, setBroadcasts] = useState(INITIAL_BROADCASTS)
-  const [incidents, setIncidents] = useState(MOCK_INCIDENTS)
+  const [incidents, setIncidents] = useState([])
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -266,6 +301,24 @@ function DashboardPage() {
     }
   }, [session])
 
+  // Load real incidents from the backend for the admin view.
+  const fetchIncidents = useCallback(async () => {
+    try {
+      const { data } = await api.get('/api/incidents')
+      if (data.success) setIncidents(data.incidents.map(mapIncident))
+    } catch (err) {
+      console.warn('Failed to fetch incidents:', err.message)
+      // Graceful demo mode: fall back to mock data only when nothing real loaded yet.
+      setIncidents((prev) => (prev.length === 0 ? MOCK_INCIDENTS : prev))
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!session) return
+
+    fetchIncidents()
+  }, [session, fetchIncidents])
+
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     window.location.assign('/')
@@ -288,6 +341,8 @@ function DashboardPage() {
         description: description.trim() || `${t.label} reported on campus`,
         severity: t.severity,
       })
+      // Refresh the admin queue so the new report shows up.
+      fetchIncidents()
     } catch (err) {
       console.warn('Incident report failed:', err.message)
       setSendError(`Incident could not be sent: ${err.message}`)

@@ -116,6 +116,7 @@ frontend attaches this automatically via an Axios interceptor.
 | GET    | `/test-db`       | No   | Verifies the Supabase connection                   |
 | GET    | `/api/auth/me`   | Yes  | Returns the current user's `id` and `email`        |
 | POST   | `/api/incidents` | Yes  | Creates an incident (`type`, `description`, `severity` in body) |
+| GET    | `/api/incidents` | Yes  | Lists all incidents, newest first                  |
 
 ### Example: create an incident
 
@@ -150,7 +151,8 @@ curl -X POST http://localhost:3000/api/incidents \
 
 ## Notes
 
-- The admin map and incident queue currently render mock data — there is no GET
-  incidents endpoint yet, so real incidents don't populate the admin views.
+- The admin map and incident queue are populated from `GET /api/incidents`.
+  When the backend is unreachable, the dashboard falls back to mock data so the
+  UI can still be explored.
 - Incident broadcasts to nearby students are simulated client-side; a realtime
   layer (e.g. Supabase Realtime or WebSockets) would be the next step.
