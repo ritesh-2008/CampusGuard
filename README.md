@@ -15,8 +15,6 @@ security/admins track everything on a live map and incident queue.
 - **Admin dashboard** — live campus map with incident markers, an incident queue
   with status workflow (pending → active → responding → resolved), and stats
   (active incidents, responders on scene, resolved today, students alerted).
-- **Graceful demo mode** — when the backend isn't reachable, the dashboard falls
-  back to mock data so the UI can still be explored.
 
 ## Tech Stack
 
@@ -56,6 +54,17 @@ security/admins track everything on a live map and incident queue.
     - `status` (text, default `pending`)
     - `reported_by` (uuid, references `auth.users.id`)
     - `created_at` (timestamptz, default `now()`)
+  - **Realtime enabled** for the `incidents` table (Database → Replication →
+    enable for `incidents`) so new reports stream to the admin queue live.
+  - A **SELECT policy** for authenticated users so realtime subscriptions are
+    authorized — without it, `postgres_changes` events are not delivered:
+
+    ```sql
+    create policy "Authenticated users can read incidents"
+    on public.incidents for select
+    to authenticated
+    using (true);
+    ```
 
 ## Getting Started
 
@@ -151,8 +160,8 @@ curl -X POST http://localhost:3000/api/incidents \
 
 ## Notes
 
-- The admin map and incident queue are populated from `GET /api/incidents`.
-  When the backend is unreachable, the dashboard falls back to mock data so the
-  UI can still be explored.
-- Incident broadcasts to nearby students are simulated client-side; a realtime
-  layer (e.g. Supabase Realtime or WebSockets) would be the next step.
+- The admin map and incident queue load their initial list from
+  `GET /api/incidents`, then live-update via Supabase Realtime
+  (`postgres_changes` on the `incidents` table).
+- Nearby broadcasts currently only show alerts you've sent in this session; a
+  realtime feed of other students' reports would be the next step.

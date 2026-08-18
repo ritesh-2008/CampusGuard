@@ -2,66 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import api from '../lib/axios.js'
-import { INCIDENT_TYPES, typeById } from '../lib/incidents.js'
+import { INCIDENT_TYPES, typeById } from '../lib/incidents.js' 
 import './DashboardPage.css'
-
-// Demo data for the admin live map / queue (no GET incidents endpoint exists yet)
-const MOCK_INCIDENTS = [
-  {
-    id: 1,
-    type: 'fire',
-    location: 'Chemistry Lab',
-    distance: 180,
-    exit: 'Gate 2',
-    status: 'active',
-    time: '2 min ago',
-    alerted: 132,
-    x: 64,
-    y: 30,
-  },
-  {
-    id: 2,
-    type: 'medical',
-    location: 'Sports Complex',
-    distance: 240,
-    exit: 'Gate 1',
-    status: 'responding',
-    time: '6 min ago',
-    alerted: 89,
-    x: 30,
-    y: 68,
-  },
-  {
-    id: 3,
-    type: 'suspicious',
-    location: 'North Parking',
-    distance: 420,
-    exit: 'Gate 4',
-    status: 'pending',
-    time: '11 min ago',
-    alerted: 64,
-    x: 80,
-    y: 74,
-  },
-  {
-    id: 4,
-    type: 'infrastructure',
-    location: 'Library · 3rd floor',
-    distance: 310,
-    exit: 'Gate 2',
-    status: 'resolved',
-    time: '38 min ago',
-    alerted: 210,
-    x: 44,
-    y: 42,
-  },
-]
-
-const INITIAL_BROADCASTS = [
-  { id: 'b1', type: 'fire', location: 'Chemistry Lab', distance: 180, exit: 'Gate 2', time: '2 min ago' },
-  { id: 'b2', type: 'medical', location: 'Sports Complex', distance: 240, exit: 'Gate 1', time: '6 min ago' },
-  { id: 'b3', type: 'suspicious', location: 'North Parking', distance: 420, exit: 'Gate 4', time: '11 min ago' },
-]
 
 const STATUS_META = {
   active: { label: 'Active', className: 'chip-active' },
@@ -265,7 +207,7 @@ function DashboardPage() {
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState(null)
   const [sentAlert, setSentAlert] = useState(null)
-  const [broadcasts, setBroadcasts] = useState(INITIAL_BROADCASTS)
+  const [broadcasts, setBroadcasts] = useState([])
   const [incidents, setIncidents] = useState([])
 
   useEffect(() => {
@@ -291,9 +233,15 @@ function DashboardPage() {
 
     api
       .get('/api/auth/me')
+      .then(() => {
+        if (!cancelled) setError(null)
+      })
       .catch((err) => {
         console.warn('Failed to verify session:', err.message)
-        if (!cancelled) setError('Could not reach the campus server.')
+        // Only show error for actual connection failures, not HTTP errors like 401.
+        if (!cancelled && !err.response) {
+          setError('Could not reach the campus server. Please check your connection.')
+        }
       })
 
     return () => {
@@ -303,21 +251,79 @@ function DashboardPage() {
 
   // Load real incidents from the backend for the admin view.
   const fetchIncidents = useCallback(async () => {
-    try {
-      const { data } = await api.get('/api/incidents')
-      if (data.success) setIncidents(data.incidents.map(mapIncident))
-    } catch (err) {
-      console.warn('Failed to fetch incidents:', err.message)
-      // Graceful demo mode: fall back to mock data only when nothing real loaded yet.
-      setIncidents((prev) => (prev.length === 0 ? MOCK_INCIDENTS : prev))
-    }
+    const { data } = await api.get('/api/incidents')
+    return data.success ? data.incidents.map(mapIncident) : null
   }, [])
 
   useEffect(() => {
     if (!session) return
 
+    let cancelled = false
+
     fetchIncidents()
+      .then((mapped) => {
+        if (!cancelled) {
+          if (mapped) {
+            setIncidents(mapped)
+            setError(null) // Clear any previous connection error on success.
+          }
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          console.warn('Failed to fetch incidents:', err.message)
+          // Only surface connection-level failures as a banner.
+          if (!err.response) {
+            setError('Could not reach the campus server. The dashboard will update once the connection is restored.')
+          }
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
   }, [session, fetchIncidents])
+
+  // Live-update the queue when new incidents are reported elsewhere (Supabase Realtime).
+  useEffect(() => {
+    if (!session) return
+
+    const channel = supabase
+      .channel('incidents-live')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'incidents' },
+        (payload) => {
+          const inc = mapIncident(payload.new)
+          // Dedupe: the refetch after reporting may have already added this one.
+          setIncidents((prev) => (prev.some((i) => i.id === inc.id) ? prev : [inc, ...prev]))
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [session])
+
+  // Auto-retry when the backend is unreachable — attempt every 10 s until it
+  // responds, then refresh the incident queue and clear the error banner.
+  useEffect(() => {
+    if (!session || !error) return
+
+    const id = setInterval(() => {
+      fetchIncidents()
+        .then((mapped) => {
+          if (mapped) {
+            setIncidents(mapped)
+            setError(null)
+          }
+        })
+        .catch(() => {}) // still unreachable — try again next interval
+    }, 10_000)
+
+    return () => clearInterval(id)
+  }, [session, error, fetchIncidents])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -343,6 +349,13 @@ function DashboardPage() {
       })
       // Refresh the admin queue so the new report shows up.
       fetchIncidents()
+        .then((mapped) => {
+          if (mapped) {
+            setIncidents(mapped)
+            setError(null) // Clear connection error on success.
+          }
+        })
+        .catch((err) => console.warn('Failed to refresh incidents:', err.message))
     } catch (err) {
       console.warn('Incident report failed:', err.message)
       setSendError(`Incident could not be sent: ${err.message}`)
@@ -434,7 +447,11 @@ function DashboardPage() {
       </header>
 
       <main className="dash-main">
-        {error && <p className="dash-error-banner">{error}</p>}
+        {error && (
+          <p className="dash-error-banner" onClick={() => setError(null)} role="alert" style={{ cursor: 'pointer' }} title="Click to dismiss">
+            {error}
+          </p>
+        )}
 
         {role === 'student' ? (
           <div className="dash-grid">

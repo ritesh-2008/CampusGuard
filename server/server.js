@@ -20,7 +20,7 @@ app.use(cors({
 }));
 
 app.get("/health", (req, res) => {
-    res.json({ status: 'ok', message: 'CodeCrew Backend is running' })
+    res.json({ status: 'ok', message: 'CampusGuard Backend is running' })
 })
 
 app.get("/test-db", async(req, res) => {
