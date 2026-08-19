@@ -56,15 +56,31 @@ security/admins track everything on a live map and incident queue.
     - `created_at` (timestamptz, default `now()`)
   - **Realtime enabled** for the `incidents` table (Database → Replication →
     enable for `incidents`) so new reports stream to the admin queue live.
-  - A **SELECT policy** for authenticated users so realtime subscriptions are
-    authorized — without it, `postgres_changes` events are not delivered:
+  - **Row-Level Security policies** so the anon key (used by the frontend) and
+    the service-role key (used by the backend) can both access the table:
 
     ```sql
+    -- Allow authenticated users to read all incidents (needed for Realtime)
     create policy "Authenticated users can read incidents"
     on public.incidents for select
     to authenticated
     using (true);
+
+    -- Allow authenticated users to insert their own incidents
+    create policy "Authenticated users can insert incidents"
+    on public.incidents for insert
+    to authenticated
+    with check (auth.uid() = reported_by);
+
+    -- Allow anyone (including anon) to read incidents for the admin dashboard
+    create policy "Anyone can read incidents"
+    on public.incidents for select
+    to anon
+    using (true);
     ```
+
+    > **Note:** The backend server should use the **service_role** key (not the
+    > anon key) so it can insert/update incidents without being restricted by RLS.
 
 ## Getting Started
 
@@ -79,17 +95,19 @@ npm run dev            # starts on http://localhost:3000
 
 Environment variables for `server/.env`:
 
-| Variable       | Description                                            |
-| -------------- | ------------------------------------------------------ |
-| `SUPABASE_URL` | Your Supabase project URL (Settings → API)             |
-| `SUPABASE_KEY` | Supabase service-role or anon key (Settings → API)     |
-| `PORT`         | Server port (default: `3000`)                          |
-| `HOST`         | Bind host (default: `0.0.0.0`)                         |
-| `CLIENT_URL`   | Allowed CORS origin(s), comma-separated (default: `http://localhost:5173`) |
+| Variable                   | Description                                            |
+| -------------------------- | ------------------------------------------------------ |
+| `SUPABASE_URL`             | Your Supabase project URL (Settings → API)             |
+| `SUPABASE_SERVICE_ROLE_KEY`| **Required.** service-role key (Settings → API) — bypasses RLS |
+| `SUPABASE_KEY`             | Fallback if `SUPABASE_SERVICE_ROLE_KEY` is not set      |
+| `PORT`                     | Server port (default: `3000`)                          |
+| `HOST`                     | Bind host (default: `0.0.0.0`)                         |
+| `CLIENT_URL`               | Allowed CORS origin(s), comma-separated (default: `http://localhost:5173`) |
 
-> **Note:** the backend verifies JWT tokens with `Supabase.auth.getUser(token)`,
-> so the key you use must be one the Supabase client SDK accepts for that call
-> (e.g. the anon key).
+> **Important:** The backend inserts incidents into a table protected by
+> Row-Level Security. You **must** use the `service_role` key (Settings → API
+> → `service_role`) in `SUPABASE_SERVICE_ROLE_KEY`. The anon key will be
+> rejected by RLS unless you also add INSERT policies.
 
 ### 2. Frontend
 
