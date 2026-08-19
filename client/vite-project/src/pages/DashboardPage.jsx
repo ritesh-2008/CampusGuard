@@ -6,10 +6,10 @@ import { INCIDENT_TYPES, typeById } from '../lib/incidents.js'
 import './DashboardPage.css'
 
 const STATUS_META = {
-  active: { label: 'Active', className: 'chip-active' },
   pending: { label: 'Pending', className: 'chip-pending' },
-  responding: { label: 'Responding', className: 'chip-responding' },
-  resolved: { label: 'Resolved', className: 'chip-resolved' },
+  verified: { label: 'Verified', className: 'chip-responding' },
+  solved: { label: 'Solved', className: 'chip-resolved' },
+  rejected: { label: 'Rejected', className: 'chip-active' },
 }
 
 // Derive display-only fields the admin UI needs but the DB doesn't store.
@@ -140,7 +140,7 @@ function CampusMap({ incidents }) {
 
         {/* Incident markers */}
         {incidents
-          .filter((inc) => inc.status !== 'resolved')
+          .filter((inc) => inc.status !== 'solved' && inc.status !== 'rejected')
           .map((inc) => {
             const t = typeById(inc.type)
             return (
@@ -176,20 +176,25 @@ function IncidentRow({ inc, onStatus }) {
       </div>
       <div className="incident-side">
         <span className={`chip ${status.className}`}>{status.label}</span>
-        {inc.status === 'active' && (
-          <button type="button" className="btn-sm" onClick={() => onStatus(inc.id, 'responding')}>
-            Respond
-          </button>
-        )}
-        {inc.status === 'responding' && (
-          <button type="button" className="btn-sm btn-sm-success" onClick={() => onStatus(inc.id, 'resolved')}>
-            Resolve
-          </button>
-        )}
         {inc.status === 'pending' && (
-          <button type="button" className="btn-sm" onClick={() => onStatus(inc.id, 'active')}>
-            Activate
-          </button>
+          <>
+            <button type="button" className="btn-sm" onClick={() => onStatus(inc.id, 'verified')}>
+              Verify
+            </button>
+            <button type="button" className="btn-sm btn-sm-danger" onClick={() => onStatus(inc.id, 'rejected')}>
+              Reject
+            </button>
+          </>
+        )}
+        {inc.status === 'verified' && (
+          <>
+            <button type="button" className="btn-sm btn-sm-success" onClick={() => onStatus(inc.id, 'solved')}>
+              Resolve
+            </button>
+            <button type="button" className="btn-sm btn-sm-danger" onClick={() => onStatus(inc.id, 'rejected')}>
+              Reject
+            </button>
+          </>
         )}
       </div>
     </li>
@@ -380,8 +385,18 @@ function DashboardPage() {
     setDescription('')
   }
 
-  const updateStatus = (id, status) => {
+  const updateStatus = async (id, status) => {
+    // Optimistic update
     setIncidents((prev) => prev.map((inc) => (inc.id === id ? { ...inc, status } : inc)))
+    try {
+      await api.patch(`/api/incidents/${id}/status`, { status })
+    } catch (err) {
+      console.error('Failed to update status:', err.message)
+      // Revert on failure
+      fetchIncidents()
+        .then((mapped) => { if (mapped) setIncidents(mapped) })
+        .catch(() => {})
+    }
   }
 
   if (loading) {
@@ -400,9 +415,9 @@ function DashboardPage() {
   const name = sessionUser.user_metadata?.full_name ?? 'Your account'
   const avatar = sessionUser.user_metadata?.avatar_url
 
-  const activeCount = incidents.filter((i) => i.status === 'active').length
-  const respondingCount = incidents.filter((i) => i.status === 'responding').length
-  const resolvedCount = incidents.filter((i) => i.status === 'resolved').length
+  const pendingCount = incidents.filter((i) => i.status === 'pending').length
+  const verifiedCount = incidents.filter((i) => i.status === 'verified').length
+  const solvedCount = incidents.filter((i) => i.status === 'solved').length
   const alertedCount = incidents.reduce((sum, i) => sum + i.alerted, 0)
 
   return (
@@ -544,9 +559,9 @@ function DashboardPage() {
         ) : (
           <>
             <div className="admin-stats">
-              <Stat label="Active incidents" value={activeCount} tone="danger" />
-              <Stat label="Responders on scene" value={respondingCount} tone="warning" />
-              <Stat label="Resolved today" value={resolvedCount} tone="success" />
+              <Stat label="Pending incidents" value={pendingCount} tone="danger" />
+              <Stat label="Verified incidents" value={verifiedCount} tone="warning" />
+              <Stat label="Solved today" value={solvedCount} tone="success" />
               <Stat label="Students alerted" value={alertedCount} />
             </div>
 
