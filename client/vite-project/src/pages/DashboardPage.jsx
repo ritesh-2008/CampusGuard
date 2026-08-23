@@ -414,6 +414,7 @@ function DashboardPage() {
   const { user: sessionUser } = session
   const name = sessionUser.user_metadata?.full_name ?? 'Your account'
   const avatar = sessionUser.user_metadata?.avatar_url
+  const isAdmin = !!import.meta.env.VITE_ADMIN_EMAIL && sessionUser.email === import.meta.env.VITE_ADMIN_EMAIL
 
   const pendingCount = incidents.filter((i) => i.status === 'pending').length
   const verifiedCount = incidents.filter((i) => i.status === 'verified').length
@@ -441,15 +442,17 @@ function DashboardPage() {
           >
             🎓 Student
           </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={role === 'admin'}
-            className={role === 'admin' ? 'active' : ''}
-            onClick={() => setRole('admin')}
-          >
-            🛡️ Admin
-          </button>
+          {isAdmin && (
+            <button
+              type="button"
+              role="tab"
+              aria-selected={role === 'admin'}
+              className={role === 'admin' ? 'active' : ''}
+              onClick={() => setRole('admin')}
+            >
+              🛡️ Admin
+            </button>
+          )}
         </div>
 
         <div className="dash-user">
