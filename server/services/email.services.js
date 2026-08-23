@@ -2,7 +2,7 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export const sendIncidentNotification = async ({emails,type,desciption,severity}) => {
+export const sendIncidentNotification = async ({emails,type,description,severity}) => {
   const {error,data} = await resend.emails.send({
      from: "CampusShield <onboarding@resend.dev>",
         to: emails,

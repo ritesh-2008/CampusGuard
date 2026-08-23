@@ -1,5 +1,8 @@
 import { Supabase } from "../lib/supabase.js";
 
+import { sendIncidentNotification } from "../services/email.services.js";
+import { getAllUserEmail } from "../services/user.service.js";
+
 export const incidents = async (req, res) => {
     try {
         const {
@@ -95,7 +98,7 @@ export const updateIncidentStatus = async (req, res) => {
 
         const { error, data } = await Supabase.from("incidents").update({ status: status }).eq("id", id).select().single();
 
-          if (error) {
+        if (error) {
             console.error("Supabase error:", error);
 
             return res.status(500).json({
@@ -104,11 +107,30 @@ export const updateIncidentStatus = async (req, res) => {
             });
         }
 
+        if (status == "verified") {
+            try {
+
+                const emails = await getAllUserEmail();
+                console.log("all user email:", emails);
+
+                if (emails.length > 0) {
+                    await sendIncidentNotification({
+                        emails,
+                        type: data.type,
+                        description: data.description,
+                        severity: data.severity
+                    });
+                }
+            }catch (emailerror) {
+                console.log("email error:",emailerror)
+            }
+        } 
+
         return res.status(200).json({
-            success:true,
-            incident:data
+            success: true,
+            incident: data
         })
-    }catch(error) {
+    } catch (error) {
         console.error("Update status error:", error);
 
         return res.status(500).json({
