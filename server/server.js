@@ -24,7 +24,9 @@ app.use(express.json());
 const clientOrigin = process.env.CLIENT_URL || "http://localhost:5173";
 
 app.use(cors({
-    origin: clientOrigin.split(",").map(origin => origin.trim())
+    origin: clientOrigin,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true
 }));
 
 app.get("/health", (req, res) => {
