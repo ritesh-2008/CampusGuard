@@ -3,7 +3,7 @@
 }
 
 :root {
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color-scheme: light dark;
 
   --bg: #f4f5f7;
@@ -24,6 +24,16 @@
 
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.14);
+  --shadow-glow: 0 0 40px rgba(217, 45, 32, 0.12);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 999px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -46,17 +56,62 @@
 
     --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
     --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.55);
+    --shadow-glow: 0 0 40px rgba(240, 68, 56, 0.15);
   }
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
 }
 
 button {
   font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Global link reset */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Smooth fade-in for page transitions */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
 
 /* Brand */
@@ -72,9 +127,14 @@ button {
   display: grid;
   place-items: center;
   font-size: 20px;
-  border-radius: 12px;
-  background: var(--accent);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--accent), #ff6b60);
   box-shadow: 0 6px 16px rgba(217, 45, 32, 0.35);
+  transition: transform 0.3s var(--ease-spring);
+}
+
+.brand-mark:hover {
+  transform: scale(1.08) rotate(-3deg);
 }
 
 .brand-text {
@@ -87,6 +147,7 @@ button {
   font-size: 17px;
   font-weight: 700;
   color: var(--text);
+  letter-spacing: -0.3px;
 }
 
 .brand-sub {
@@ -102,19 +163,41 @@ button {
   gap: 10px;
   width: 100%;
   padding: 12px 16px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   text-decoration: none;
-  transition: background 0.15s ease, border-color 0.15s ease;
-  background: var(--accent);
+  transition: all 0.2s var(--ease-out);
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
   color: #ffffff;
   border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+  background-size: 200% 100%;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.btn:hover::after {
+  opacity: 1;
+  animation: shimmer 1.5s ease infinite;
 }
 
 .btn:hover {
-  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(217, 45, 32, 0.35);
+}
+
+.btn:active {
+  transform: translateY(0);
 }
 
 .btn-outline {
@@ -123,12 +206,12 @@ button {
   justify-content: center;
   gap: 10px;
   padding: 10px 16px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   text-decoration: none;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: all 0.2s var(--ease-out);
   background: var(--card-bg);
   color: var(--text);
   border: 1px solid var(--border);
@@ -137,4 +220,15 @@ button {
 .btn-outline:hover {
   background: var(--bg);
   border-color: var(--muted);
+  transform: translateY(-1px);
+}
+
+.btn-outline:active {
+  transform: translateY(0);
+}
+
+/* Focus ring for accessibility */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }

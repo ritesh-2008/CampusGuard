@@ -158,11 +158,11 @@ function CampusMap({ incidents }) {
   )
 }
 
-function IncidentRow({ inc, onStatus }) {
+function IncidentRow({ inc, onStatus, index = 0 }) {
   const t = typeById(inc.type)
   const status = STATUS_META[inc.status]
   return (
-    <li className="incident-row">
+    <li className="incident-row" style={{ animationDelay: `${Math.min(index * 50, 300)}ms` }}>
       <span className="incident-emoji" style={{ background: `${t.color}1f` }}>
         {t.emoji}
       </span>
@@ -596,8 +596,8 @@ function DashboardPage() {
                   <p>Assign responders and resolve incidents as they're handled.</p>
                 </div>
                 <ul className="incident-list">
-                  {incidents.map((inc) => (
-                    <IncidentRow key={inc.id} inc={inc} onStatus={updateStatus} />
+                  {incidents.map((inc, i) => (
+                    <IncidentRow key={inc.id} inc={inc} onStatus={updateStatus} index={i} />
                   ))}
                 </ul>
               </section>
