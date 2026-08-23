@@ -1,13 +1,17 @@
 /* ============================================
-   DASHBOARD — Mobile-first, glass, animated
+   DASHBOARD — Premium glassmorphism UI
    ============================================ */
 
+/* ── Page shell ─────────────────────────────── */
 .dash-page {
   min-height: 100svh;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: var(--bg);
+  background:
+    radial-gradient(800px 400px at 20% 0%, rgba(217, 45, 32, 0.04), transparent 60%),
+    radial-gradient(600px 400px at 80% 100%, rgba(99, 50, 255, 0.03), transparent 55%),
+    var(--bg);
   animation: fadeIn 0.5s var(--ease-out);
 }
 
@@ -18,11 +22,14 @@
 
 .dash-muted {
   color: var(--muted);
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 500;
   animation: pulse 1.5s ease-in-out infinite;
 }
 
-/* ---------- Header ---------- */
+/* ============================================
+   HEADER — Floating glass nav
+   ============================================ */
 .dash-header {
   position: sticky;
   top: 0;
@@ -32,63 +39,71 @@
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
-  padding: 10px 24px;
-  border-bottom: 1px solid var(--border);
-  background: color-mix(in srgb, var(--card-bg) 88%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  padding: 12px 28px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  background: color-mix(in srgb, var(--card-bg) 82%, transparent);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
+/* ── Role switcher pills ────────────────────── */
 .role-switch {
   display: inline-flex;
   padding: 4px;
-  gap: 4px;
-  border-radius: var(--radius-md);
+  gap: 3px;
+  border-radius: var(--radius-full);
   background: var(--bg-alt);
   border: 1px solid var(--border);
 }
 
 .role-switch button {
-  padding: 8px 18px;
+  padding: 8px 20px;
   min-height: 40px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-full);
   border: none;
   background: transparent;
   color: var(--muted);
   font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s var(--ease-out);
+  transition: all 0.25s var(--ease-spring);
   white-space: nowrap;
 }
 
 .role-switch button:hover {
   color: var(--text);
-  background: rgba(0, 0, 0, 0.03);
+  background: color-mix(in srgb, var(--card-bg) 60%, transparent);
 }
 
 .role-switch button.active {
   background: var(--card-bg);
   color: var(--text);
-  box-shadow: var(--shadow);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
+/* ── User info ──────────────────────────────── */
 .dash-user {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .dash-avatar {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   border: 2px solid var(--border);
-  transition: transform 0.2s var(--ease-spring);
+  object-fit: cover;
+  transition: all 0.25s var(--ease-spring);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .dash-avatar:hover {
   transform: scale(1.08);
+  border-color: var(--accent);
 }
 
 .dash-user-name {
@@ -102,62 +117,81 @@
 }
 
 .btn-signout {
-  padding: 8px 14px;
+  padding: 8px 16px;
   min-height: 40px;
+  border-radius: var(--radius-full);
 }
 
-/* ---------- Main layout ---------- */
+/* ============================================
+   MAIN LAYOUT
+   ============================================ */
 .dash-main {
   flex: 1;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 28px;
 }
 
+/* ── Error banner ───────────────────────────── */
 .dash-error-banner {
-  padding: 12px 16px;
-  margin: 0 0 16px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--danger);
-  background: var(--accent-soft);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  margin: 0 0 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+  background: linear-gradient(135deg, var(--accent-soft), color-mix(in srgb, var(--accent-soft) 80%, var(--card-bg)));
   color: var(--danger);
   font-size: 14px;
-  animation: slideUp 0.3s var(--ease-out);
+  font-weight: 500;
+  animation: slideUp 0.35s var(--ease-out);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--danger) 8%, transparent);
 }
 
 .dash-error {
   margin: 12px 0 0;
   font-size: 13.5px;
+  font-weight: 500;
   color: var(--danger);
 }
 
-/* ---------- Panels ---------- */
+/* ============================================
+   PANELS — Glass card system
+   ============================================ */
 .panel {
-  padding: 24px;
+  padding: 28px;
   border-radius: var(--radius-xl);
-  border: 1px solid var(--border);
-  background: var(--card-bg);
-  box-shadow: var(--shadow);
-  transition: box-shadow 0.3s var(--ease-out);
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  background: color-mix(in srgb, var(--card-bg) 90%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 8px 32px rgba(0, 0, 0, 0.04);
+  transition: all 0.35s var(--ease-out);
 }
 
 .panel:hover {
-  box-shadow: var(--shadow-lg);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 12px 40px rgba(0, 0, 0, 0.07);
+  border-color: color-mix(in srgb, var(--border) 60%, transparent);
 }
 
 .panel-head h2 {
   margin: 0;
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 700;
   color: var(--text);
-  letter-spacing: -0.2px;
+  letter-spacing: -0.3px;
 }
 
 .panel-head p {
   margin: 6px 0 0;
   font-size: 13.5px;
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--muted);
 }
 
@@ -165,41 +199,41 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
 }
 
+/* ── Grid layouts ───────────────────────────── */
 .dash-grid {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
-  gap: 20px;
+  gap: 24px;
   align-items: start;
 }
 
 /* ============================================
-   STUDENT: Report Flow
+   STUDENT: Incident type cards
    ============================================ */
-
-/* Incident type cards */
 .type-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 18px;
+  gap: 12px;
+  margin-top: 20px;
 }
 
 .type-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 14px 8px;
-  min-height: 88px;
+  gap: 6px;
+  padding: 16px 8px;
+  min-height: 96px;
   border-radius: var(--radius-lg);
   cursor: pointer;
-  background: var(--card-bg);
+  background: color-mix(in srgb, var(--card-bg) 70%, var(--bg));
   border: 1.5px solid var(--border);
-  transition: all 0.2s var(--ease-out);
+  transition: all 0.25s var(--ease-spring);
   position: relative;
+  overflow: hidden;
 }
 
 .type-btn::before {
@@ -207,9 +241,9 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(135deg, transparent, color-mix(in srgb, var(--type-color) 8%, transparent));
+  background: linear-gradient(160deg, transparent 40%, color-mix(in srgb, var(--type-color) 10%, transparent));
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.3s;
 }
 
 .type-btn:hover::before {
@@ -217,19 +251,23 @@
 }
 
 .type-btn:hover {
-  border-color: var(--type-color);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--type-color) 20%, transparent);
+  border-color: color-mix(in srgb, var(--type-color) 60%, transparent);
+  transform: translateY(-3px);
+  box-shadow:
+    0 6px 16px color-mix(in srgb, var(--type-color) 15%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--type-color) 20%, transparent);
 }
 
 .type-btn:active {
-  transform: translateY(0);
+  transform: translateY(-1px);
 }
 
 .type-btn.selected {
   border-color: var(--type-color);
-  background: var(--bg);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--type-color) 25%, transparent);
+  background: color-mix(in srgb, var(--type-color) 6%, var(--card-bg));
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--type-color) 20%, transparent),
+    0 4px 16px color-mix(in srgb, var(--type-color) 12%, transparent);
 }
 
 .type-btn.selected::before {
@@ -237,13 +275,15 @@
 }
 
 .type-emoji {
-  font-size: 28px;
+  font-size: 30px;
   transition: transform 0.3s var(--ease-spring);
+  position: relative;
+  z-index: 1;
 }
 
 .type-btn:hover .type-emoji,
 .type-btn.selected .type-emoji {
-  transform: scale(1.15);
+  transform: scale(1.2) rotate(-3deg);
 }
 
 .type-label {
@@ -251,63 +291,79 @@
   font-weight: 600;
   color: var(--text);
   position: relative;
+  z-index: 1;
+  text-align: center;
+  line-height: 1.2;
 }
 
 .type-sev {
-  font-size: 10.5px;
+  font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
+  font-weight: 600;
   color: var(--muted);
   position: relative;
+  z-index: 1;
 }
 
-/* Description textarea */
+/* ============================================
+   STUDENT: Description textarea
+   ============================================ */
 .report-desc {
   width: 100%;
-  margin-top: 16px;
-  padding: 14px;
-  border-radius: var(--radius-md);
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
   border: 1.5px solid var(--border);
-  background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 80%, var(--card-bg));
   color: var(--text);
   font-size: 14px;
   font-family: inherit;
   resize: vertical;
   min-height: 80px;
-  transition: all 0.2s var(--ease-out);
+  transition: all 0.25s var(--ease-out);
+  line-height: 1.55;
 }
 
 .report-desc::placeholder {
   color: var(--muted);
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .report-desc:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent),
+    0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-/* Emergency alert button */
+/* ============================================
+   STUDENT: Emergency alert button
+   ============================================ */
 .alert-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
-  margin-top: 16px;
+  margin-top: 18px;
   padding: 18px;
-  min-height: 58px;
+  min-height: 60px;
   border-radius: var(--radius-lg);
   border: none;
   cursor: pointer;
   font-size: 17px;
   font-weight: 700;
+  letter-spacing: 0.2px;
   color: #ffffff;
-  background: linear-gradient(135deg, #f04438, #d92d20, #b42318);
+  background: linear-gradient(135deg, #f04438 0%, #d92d20 50%, #b42318 100%);
   background-size: 200% 100%;
-  box-shadow: 0 10px 24px rgba(217, 45, 32, 0.35);
-  transition: all 0.25s var(--ease-out);
+  box-shadow:
+    0 8px 20px rgba(217, 45, 32, 0.3),
+    0 2px 4px rgba(217, 45, 32, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: all 0.3s var(--ease-spring);
   position: relative;
   overflow: hidden;
 }
@@ -316,7 +372,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.12) 50%, transparent 70%);
+  background: linear-gradient(135deg, transparent 20%, rgba(255,255,255,0.15) 50%, transparent 80%);
   background-size: 200% 100%;
   opacity: 0;
   transition: opacity 0.3s;
@@ -328,24 +384,30 @@
 }
 
 .alert-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 32px rgba(217, 45, 32, 0.45);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow:
+    0 12px 28px rgba(217, 45, 32, 0.4),
+    0 4px 8px rgba(217, 45, 32, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
   background-position: 100% 0;
 }
 
 .alert-btn:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: 0 6px 16px rgba(217, 45, 32, 0.3);
+  transform: translateY(-1px) scale(0.99);
+  box-shadow:
+    0 4px 12px rgba(217, 45, 32, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .alert-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
   box-shadow: none;
+  transform: none;
 }
 
 .alert-siren {
-  font-size: 22px;
+  font-size: 24px;
   animation: siren 1s ease-in-out infinite;
   position: relative;
 }
@@ -353,45 +415,48 @@
 @keyframes siren {
   0%, 100% { transform: scale(1) rotate(0deg); }
   25% { transform: scale(1.15) rotate(-5deg); }
-  50% { transform: scale(1.2) rotate(0deg); }
+  50% { transform: scale(1.25) rotate(0deg); }
   75% { transform: scale(1.15) rotate(5deg); }
 }
 
 .alert-hint {
-  margin: 10px 0 0;
+  margin: 12px 0 0;
   font-size: 12.5px;
   text-align: center;
   color: var(--muted);
+  opacity: 0.8;
 }
 
 /* ============================================
    STUDENT: Broadcasts
    ============================================ */
-
 .broadcast-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 16px;
+  gap: 12px;
+  margin-top: 18px;
 }
 
 .broadcast {
-  padding: 14px 16px;
+  padding: 16px 18px;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  background: var(--bg);
-  transition: all 0.2s var(--ease-out);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--card-bg) 60%, var(--bg));
+  transition: all 0.3s var(--ease-out);
   animation: slideUp 0.4s var(--ease-out) both;
 }
 
 .broadcast:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  border-color: color-mix(in srgb, var(--border) 50%, transparent);
 }
 
 .broadcast-mine {
-  border-color: var(--danger);
-  background: var(--accent-soft);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 15%, transparent);
+  border-color: color-mix(in srgb, var(--danger) 40%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 90%, var(--card-bg)), var(--accent-soft));
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--danger) 10%, transparent),
+    0 4px 16px color-mix(in srgb, var(--danger) 8%, transparent);
 }
 
 .broadcast-head {
@@ -402,9 +467,9 @@
 }
 
 .broadcast-siren {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 800;
-  letter-spacing: 0.8px;
+  letter-spacing: 1px;
   color: var(--danger);
   text-transform: uppercase;
 }
@@ -412,26 +477,29 @@
 .broadcast-time {
   font-size: 12px;
   color: var(--muted);
+  font-weight: 500;
 }
 
 .broadcast-title {
-  margin: 8px 0;
-  font-size: 14.5px;
+  margin: 10px 0;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text);
+  line-height: 1.35;
 }
 
 .broadcast-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 16px;
+  gap: 8px 18px;
   font-size: 12.5px;
   color: var(--muted);
 }
 
 .broadcast-note {
-  margin: 10px 0 0;
-  font-size: 12.5px;
+  margin: 12px 0 0;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--success);
 }
 
@@ -439,21 +507,22 @@
   color: var(--warning);
 }
 
+/* ── Safety / Emergency contacts card ───────── */
 .safety-card {
-  margin-top: 18px;
-  padding: 18px;
+  margin-top: 20px;
+  padding: 20px;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  background: var(--bg);
-  transition: box-shadow 0.2s var(--ease-out);
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  background: color-mix(in srgb, var(--card-bg) 50%, var(--bg));
+  transition: all 0.25s var(--ease-out);
 }
 
 .safety-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
 .safety-card h3 {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   font-size: 14px;
   font-weight: 700;
   color: var(--text);
@@ -465,70 +534,100 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .safety-card li {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
   font-size: 13.5px;
   color: var(--muted);
-  transition: background 0.15s;
+  transition: all 0.2s var(--ease-out);
 }
 
 .safety-card li:hover {
-  background: rgba(0, 0, 0, 0.03);
+  background: color-mix(in srgb, var(--accent-soft) 50%, transparent);
+  color: var(--text);
+}
+
+.safety-card li:hover strong {
+  color: var(--danger);
 }
 
 .safety-card strong {
   color: var(--text);
+  font-weight: 700;
+  transition: color 0.2s;
 }
 
 /* ============================================
-   ADMIN: Stats
+   ADMIN: Stats cards
    ============================================ */
-
 .admin-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-bottom: 20px;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .stat-card {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 20px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  background: var(--card-bg);
-  transition: all 0.2s var(--ease-out);
+  gap: 6px;
+  padding: 22px 24px;
+  border-radius: var(--radius-xl);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--card-bg) 88%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.3s var(--ease-spring);
   animation: slideUp 0.5s var(--ease-out) both;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--border);
+  transition: background 0.3s;
 }
 
 .stat-card:nth-child(1) { animation-delay: 0.05s; }
+.stat-card:nth-child(1)::after { background: var(--danger); }
 .stat-card:nth-child(2) { animation-delay: 0.1s; }
+.stat-card:nth-child(2)::after { background: var(--warning); }
 .stat-card:nth-child(3) { animation-delay: 0.15s; }
+.stat-card:nth-child(3)::after { background: var(--success); }
 .stat-card:nth-child(4) { animation-delay: 0.2s; }
+.stat-card:nth-child(4)::after { background: var(--accent); }
 
 .stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 0 0 1px color-mix(in srgb, var(--border) 50%, transparent);
 }
 
 .stat-value {
-  font-size: 32px;
+  font-size: 34px;
   font-weight: 800;
   color: var(--text);
   letter-spacing: -0.5px;
+  line-height: 1;
 }
 
 .stat-label {
   font-size: 13px;
+  font-weight: 500;
   color: var(--muted);
 }
 
@@ -539,26 +638,26 @@
 /* ============================================
    ADMIN: Map
    ============================================ */
-
 .admin-grid {
   display: grid;
   grid-template-columns: 1.5fr 1fr;
-  gap: 20px;
+  gap: 24px;
   align-items: start;
 }
 
 .live-badge {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 5px 14px;
+  gap: 8px;
+  padding: 6px 16px;
   border-radius: var(--radius-full);
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.8px;
+  letter-spacing: 1px;
   color: var(--danger);
-  background: var(--accent-soft);
-  border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
+  background: linear-gradient(135deg, var(--accent-soft), color-mix(in srgb, var(--accent-soft) 70%, var(--card-bg)));
+  border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--danger) 10%, transparent);
 }
 
 .live-dot {
@@ -571,14 +670,15 @@
 
 @keyframes live-pulse {
   0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
-  100% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
 }
 
 .map-wrap {
-  margin-top: 16px;
-  border-radius: var(--radius-md);
+  margin-top: 18px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .campus-map {
@@ -599,6 +699,12 @@
   fill: var(--card-bg);
   stroke: var(--border);
   stroke-width: 1.5;
+  transition: all 0.2s;
+}
+
+.map-zone:hover rect {
+  fill: color-mix(in srgb, var(--card-bg) 80%, var(--bg));
+  stroke: color-mix(in srgb, var(--border) 50%, var(--muted));
 }
 
 .map-zone text {
@@ -648,22 +754,25 @@
   font-size: 12.5px;
   font-weight: 700;
   paint-order: stroke;
-  stroke: rgba(0, 0, 0, 0.6);
+  stroke: rgba(0, 0, 0, 0.65);
   stroke-width: 3.5px;
 }
 
 .map-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 16px;
-  margin-top: 14px;
+  gap: 10px 18px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
 }
 
 .legend-item {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12.5px;
+  font-size: 12px;
+  font-weight: 500;
   color: var(--muted);
 }
 
@@ -671,51 +780,52 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
 /* ============================================
    ADMIN: Incident Queue
    ============================================ */
-
 .incident-list {
   list-style: none;
-  margin: 16px 0 0;
+  margin: 18px 0 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .incident-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px;
+  gap: 14px;
+  padding: 16px;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  background: var(--card-bg);
-  transition: all 0.2s var(--ease-out);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--card-bg) 60%, var(--bg));
+  transition: all 0.25s var(--ease-out);
   animation: slideUp 0.3s var(--ease-out) both;
 }
 
 .incident-row:hover {
-  border-color: color-mix(in srgb, var(--muted) 50%, transparent);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border-color: color-mix(in srgb, var(--muted) 40%, transparent);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  transform: translateX(2px);
 }
 
 .incident-emoji {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  font-size: 20px;
-  border-radius: var(--radius-md);
-  transition: transform 0.2s var(--ease-spring);
+  font-size: 22px;
+  border-radius: var(--radius-lg);
+  transition: all 0.25s var(--ease-spring);
 }
 
 .incident-row:hover .incident-emoji {
-  transform: scale(1.1);
+  transform: scale(1.12) rotate(-3deg);
 }
 
 .incident-info {
@@ -725,14 +835,15 @@
 
 .incident-title {
   margin: 0;
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 600;
   color: var(--text);
+  line-height: 1.3;
 }
 
 .incident-sub {
-  margin: 3px 0 0;
-  font-size: 12px;
+  margin: 4px 0 0;
+  font-size: 12.5px;
   color: var(--muted);
   line-height: 1.4;
 }
@@ -741,84 +852,96 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 6px;
+  gap: 8px;
 }
 
-/* Status chips */
+/* ── Status chips ───────────────────────────── */
 .chip {
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: var(--radius-full);
   font-size: 11.5px;
   font-weight: 600;
   text-transform: capitalize;
   white-space: nowrap;
+  letter-spacing: 0.2px;
 }
 
 .chip-active {
-  background: var(--accent-soft);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--danger) 12%, transparent), color-mix(in srgb, var(--danger) 6%, transparent));
   color: var(--danger);
+  border: 1px solid color-mix(in srgb, var(--danger) 20%, transparent);
 }
 
 .chip-responding {
-  background: color-mix(in srgb, var(--warning) 18%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--warning) 14%, transparent), color-mix(in srgb, var(--warning) 6%, transparent));
   color: var(--warning);
+  border: 1px solid color-mix(in srgb, var(--warning) 20%, transparent);
 }
 
 .chip-pending {
   background: var(--bg-alt);
   color: var(--muted);
+  border: 1px solid color-mix(in srgb, var(--muted) 15%, transparent);
 }
 
 .chip-resolved {
-  background: color-mix(in srgb, var(--success) 16%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--success) 14%, transparent), color-mix(in srgb, var(--success) 6%, transparent));
   color: var(--success);
+  border: 1px solid color-mix(in srgb, var(--success) 20%, transparent);
 }
 
-/* Action buttons */
+/* ── Action buttons ─────────────────────────── */
 .btn-sm {
-  padding: 7px 14px;
-  min-height: 34px;
-  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  min-height: 36px;
+  border-radius: var(--radius-md);
   border: none;
   cursor: pointer;
   font-size: 12.5px;
   font-weight: 600;
   background: var(--accent);
   color: #ffffff;
-  transition: all 0.15s var(--ease-out);
+  transition: all 0.2s var(--ease-spring);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
 .btn-sm:hover {
   background: var(--accent-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 25%, transparent);
 }
 
 .btn-sm:active {
   transform: translateY(0);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--accent) 15%, transparent);
 }
 
 .btn-sm-success {
   background: var(--success);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--success) 20%, transparent);
 }
 
 .btn-sm-success:hover {
-  filter: brightness(0.95);
+  background: color-mix(in srgb, var(--success) 90%, #000);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--success) 25%, transparent);
 }
 
 .btn-sm-danger {
   background: transparent;
   color: var(--danger);
-  border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
+  border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent);
+  box-shadow: none;
 }
 
 .btn-sm-danger:hover {
   background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--danger) 40%, transparent);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--danger) 10%, transparent);
 }
 
 /* ============================================
    MOBILE BOTTOM NAV
    ============================================ */
-
 .mobile-nav {
   display: none;
 }
@@ -826,7 +949,6 @@
 /* ============================================
    PULL TO REFRESH
    ============================================ */
-
 .ptr-container {
   position: relative;
   overflow: hidden;
@@ -869,7 +991,7 @@
 }
 
 /* ============================================
-   RESPONSIVE — Mobile First
+   RESPONSIVE
    ============================================ */
 
 /* Tablets */
@@ -902,11 +1024,11 @@
     gap: 0;
     padding: 6px 8px;
     padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
-    background: color-mix(in srgb, var(--card-bg) 85%, transparent);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-top: 1px solid var(--border);
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    background: color-mix(in srgb, var(--card-bg) 80%, transparent);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.1);
   }
 
   .mobile-nav-item {
@@ -917,13 +1039,13 @@
     justify-content: center;
     gap: 3px;
     padding: 8px 4px;
-    min-height: 52px;
+    min-height: 54px;
     border: none;
     background: transparent;
     color: var(--muted);
     cursor: pointer;
     border-radius: var(--radius-md);
-    transition: all 0.2s var(--ease-out);
+    transition: all 0.25s var(--ease-spring);
     position: relative;
     -webkit-tap-highlight-color: transparent;
   }
@@ -957,7 +1079,7 @@
   .mobile-nav-icon {
     font-size: 22px;
     line-height: 1;
-    transition: transform 0.2s var(--ease-spring);
+    transition: transform 0.25s var(--ease-spring);
   }
 
   .mobile-nav-item.active .mobile-nav-icon {
@@ -982,40 +1104,41 @@
 
   .type-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: 10px;
   }
 
   .type-btn {
-    min-height: 80px;
-    padding: 12px 8px;
+    min-height: 82px;
+    padding: 14px 8px;
   }
 
   .panel {
-    padding: 18px;
+    padding: 20px;
     border-radius: var(--radius-lg);
   }
 
   .panel-head h2 {
-    font-size: 16px;
+    font-size: 17px;
   }
 
   .stat-card {
-    padding: 16px;
+    padding: 18px 20px;
   }
 
   .stat-value {
-    font-size: 26px;
+    font-size: 28px;
   }
 
   .alert-btn {
-    min-height: 54px;
+    min-height: 56px;
     font-size: 16px;
+    padding: 16px;
   }
 
   .incident-row {
     flex-wrap: wrap;
     gap: 10px;
-    padding: 12px;
+    padding: 14px;
   }
 
   .incident-side {
@@ -1027,11 +1150,15 @@
   }
 
   .broadcast {
-    padding: 12px 14px;
+    padding: 14px 16px;
   }
 
   .map-wrap {
     overflow-x: auto;
+  }
+
+  .admin-stats {
+    gap: 10px;
   }
 }
 
@@ -1043,16 +1170,16 @@
 
   .type-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
+    gap: 8px;
   }
 
   .type-btn {
-    min-height: 72px;
-    padding: 10px 6px;
+    min-height: 74px;
+    padding: 12px 6px;
   }
 
   .type-emoji {
-    font-size: 24px;
+    font-size: 26px;
   }
 
   .type-label {
@@ -1060,6 +1187,14 @@
   }
 
   .panel {
-    padding: 14px;
+    padding: 16px;
+  }
+
+  .stat-card {
+    padding: 14px 16px;
+  }
+
+  .stat-value {
+    font-size: 24px;
   }
 }
